@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 import os
 
 app = Flask(__name__)
-
 HISTORY_DIR = 'history'
 os.makedirs(HISTORY_DIR, exist_ok=True)
 
@@ -15,6 +14,14 @@ def get_history(history_type):
         return history
     else:
         return 'No history found for this type', 404
+
+@app.route('/history/<history_type>', methods=['POST'])
+def save_to_history(history_type):
+    result = request.json['result']
+    history_file = os.path.join(HISTORY_DIR, f"{history_type}.txt")
+    with open(history_file, 'a') as f:
+        f.write(result + '\n')
+    return 'Result saved to history'
 
 @app.route('/history/<history_type>', methods=['DELETE'])
 def delete_history(history_type):
